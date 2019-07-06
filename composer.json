@@ -1,0 +1,22 @@
+{
+    "name": "artems/gendiff",
+    "description": "This package can find difference between two text object in many formats like yaml, json e.t.c.",
+    "type": "project",
+        "scripts": {
+        "phpcs": "phpcs"
+    },
+    "require": {
+        "wp-cli/php-cli-tools": "^0.11.11",
+        "docopt/docopt": "^1.0"
+    },
+    "require-dev": {
+        "squizlabs/php_codesniffer": "^3.4"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "solar05",
+            "email": "artem00298@gmail.com"
+        }
+    ]
+}
