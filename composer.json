@@ -2,15 +2,28 @@
     "name": "artems/gendiff",
     "description": "This package can find difference between two text object in many formats like yaml, json e.t.c.",
     "type": "project",
-        "scripts": {
-        "phpcs": "phpcs"
+    "scripts": {
+        "phpcs": "phpcs",
+        "phpunit": "phpunit",
+        "test": "phpunit tests"
     },
+    "bin": [
+        "bin/gendiff"
+    ],
+    "autoload": {
+        "files": [
+            "src/main.php"
+        ]
+    },
+    "keywords": ["difference", "console"],
     "require": {
         "wp-cli/php-cli-tools": "^0.11.11",
         "docopt/docopt": "^1.0"
     },
     "require-dev": {
-        "squizlabs/php_codesniffer": "^3.4"
+        "squizlabs/php_codesniffer": "^3.4",
+        "phpunit/phpunit": "^8.2",
+        "symfony/var-dumper": "^4.3"
     },
     "license": "MIT",
     "authors": [
