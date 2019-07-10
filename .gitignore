@@ -2,3 +2,5 @@
 /src/.DS_Store
 .idea/
 .DS_Store
+bin/a.json
+bin/b.json
