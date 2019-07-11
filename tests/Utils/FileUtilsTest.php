@@ -8,7 +8,7 @@ use function Gendiff\Utils\FileUtils\getJsonFileContent;
 
 class FileUtilsTest extends TestCase
 {
-    public function testIsFileExistTest()
+    public function testIsFileExist()
     {
         $this->assertFalse(isFileExist('fds', './tests/Utils/'));
         $this->assertTrue(isFileExist('testfile.json', './tests/Utils/'));
