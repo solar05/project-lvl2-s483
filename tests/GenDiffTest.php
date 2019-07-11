@@ -16,7 +16,7 @@ class GenDiffTest extends TestCase
 {
     public function testGenerateDiff()
     {
-        $testDir = './bin/';
+        $testDir = './tests/';
         $firstFile = getJsonFileContent('a.json', $testDir);
         $secondFile = getJsonFileContent('b.json', $testDir);
         $report = generateDiff($firstFile, $secondFile);
