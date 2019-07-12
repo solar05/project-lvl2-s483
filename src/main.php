@@ -5,6 +5,7 @@ namespace Gendiff\Main;
 use function cli\line;
 use Docopt;
 use Gendiff\Utils\FileUtils;
+use function Gendiff\Utils\FileUtils\getYamlFileContent;
 
 function run()
 {
@@ -22,8 +23,12 @@ Options:
     $args = Docopt::handle($documentation, array('version' => 'GenDiff 1.0'));
     [$firstArg, $secondArg] = $args->args['<file>'];
     $pathToFiles = $args->args['--path'];
-    $firstFile = FileUtils\getJsonFileContent($firstArg, $pathToFiles);
-    $secondFile = FileUtils\getJsonFileContent($secondArg, $pathToFiles);
+    //$firstFile = FileUtils\getJsonFileContent($firstArg, $pathToFiles);
+    //$secondFile = FileUtils\getJsonFileContent($secondArg, $pathToFiles);
+    //$report = generateDiff($firstFile, $secondFile);
+    //line($report);
+    $firstFile = getYamlFileContent($firstArg, $pathToFiles);
+    $secondFile = getYamlFileContent($secondArg, $pathToFiles);
     $report = generateDiff($firstFile, $secondFile);
     line($report);
 }

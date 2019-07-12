@@ -4,3 +4,5 @@
 .DS_Store
 bin/a.json
 bin/b.json
+bin/a.yaml
+bin/b.yaml
