@@ -3,42 +3,21 @@
 namespace Gendiff\Tests\Utils;
 
 use PHPUnit\Framework\TestCase;
-use function Gendiff\Utils\FileUtils\isFileExist;
-use function Gendiff\Utils\FileUtils\getJsonFileContent;
-use function Gendiff\Utils\FileUtils\getYamlFileContent;
+use function Gendiff\Utils\FileUtils\isFilesExists;
+use function Gendiff\Utils\FileUtils\isFilesExtensionSame;
 
 class FileUtilsTest extends TestCase
 {
     public function testIsFileExist()
     {
-        $path = './tests/Utils/';
-        $this->assertFalse(isFileExist('fds', $path));
-        $this->assertTrue(isFileExist('testfile.json', $path));
+        $path = './fixtures/';
+        $this->assertFalse(isFilesExists("{$path}fds", "{$path}b.json"));
+        $this->assertTrue(isFilesExists("{$path}testfile.json", "{$path}a.json"));
     }
 
-    public function testGetJsonFileContent()
+    public function testIsFilesExtensionSame()
     {
-        $path = './tests/Utils/';
-        $this->assertEquals([], getJsonFileContent('fsdfs', $path));
-        $firstFileContent = getJsonFileContent('testfile.json', $path);
-        $secondFileContent = getJsonFileContent('testfile.json', $path);
-        $this->assertEquals(["timeout" => 20,
-            "verbose" => true,
-            "host" => "hexlet.io"], $firstFileContent);
-        $this->assertEquals($firstFileContent, $secondFileContent);
-        $this->assertNotEquals($firstFileContent['verbose'] = false, $secondFileContent);
-    }
-
-    public function testGetYamlFileContent()
-    {
-        $path = './tests/Utils/';
-        $this->assertEquals([], getYamlFileContent('fsdfs', $path));
-        $firstFileContent = getYamlFileContent('testfile.yaml', $path);
-        $secondFileContent = getYamlFileContent('testfile.yaml', $path);
-        $this->assertEquals(["timeout" => 20,
-            "verbose" => true,
-            "host" => "hexlet.io"], $firstFileContent);
-        $this->assertEquals($firstFileContent, $secondFileContent);
-        $this->assertNotEquals($firstFileContent['verbose'] = false, $secondFileContent);
+        $this->assertTrue(isFilesExtensionSame('a.json', 'b.json'));
+        $this->assertFalse(isFilesExtensionSame('a.json', 'b.yaml'));
     }
 }

@@ -2,32 +2,14 @@
 
 namespace Gendiff\Utils\FileUtils;
 
-use function Funct\Collection\flatten;
-use Symfony\Component\Yaml\Yaml;
-
-function isFileExist($fileName, $fileLocation)
+function isFilesExists($firstFilePath, $secondFilePath)
 {
-    return file_exists("{$fileLocation}{$fileName}");
+    return file_exists($firstFilePath) && file_exists($secondFilePath);
 }
 
-function getJsonFileContent($fileName, $fileLocation)
+function isFilesExtensionSame($firstFileName, $secondFileName)
 {
-    if (!isFileExist($fileName, $fileLocation)) {
-        return [];
-    }
-    $fileRawContent = file_get_contents("{$fileLocation}{$fileName}");
-    $fileJsonContent = json_decode($fileRawContent, true);
-    return $fileJsonContent;
-}
-
-function getYamlFileContent($fileName, $fileLocation)
-{
-    if (!isFileExist($fileName, $fileLocation)) {
-        return [];
-    }
-    $fileContent = Yaml::parseFile("{$fileLocation}{$fileName}");
-    foreach ($fileContent as $key => $value) {
-        $fileContent[$key] = $fileContent[$key][0];
-    }
-    return $fileContent;
+    $firstFileExtension = explode('.', $firstFileName);
+    $secondFileExtension = explode('.', $secondFileName);
+    return $firstFileExtension[1] === $secondFileExtension[1];
 }

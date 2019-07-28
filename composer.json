@@ -13,7 +13,9 @@
     "autoload": {
         "files": [
             "src/main.php",
-            "src/Utils/FileUtils.php"
+            "src/Utils/FileUtils.php",
+            "src/Parser/FileParser.php",
+            "src/AST/Ast.php"
         ]
     },
     "keywords": ["difference", "console", "library"],
@@ -25,8 +27,7 @@
     },
     "require-dev": {
         "squizlabs/php_codesniffer": "^3.4",
-        "phpunit/phpunit": "^8.2",
-        "symfony/var-dumper": "^4.3"
+        "phpunit/phpunit": "^8.2"
     },
     "license": "MIT",
     "authors": [

@@ -4,8 +4,10 @@ namespace Gendiff\Main;
 
 use function cli\line;
 use Docopt;
-use Gendiff\Utils\FileUtils;
-use function Gendiff\Utils\FileUtils\getYamlFileContent;
+use function Gendiff\Utils\FileUtils\isFilesExtensionSame;
+use function Gendiff\Utils\FileUtils\isFilesExists;
+use Gendiff\FileParser\FileParser;
+use Gendiff\AST;
 
 function run()
 {
@@ -21,40 +23,25 @@ Options:
   --format <fmt>                Report format [default: pretty]
 ";
     $args = Docopt::handle($documentation, array('version' => 'GenDiff 1.0'));
-    [$firstArg, $secondArg] = $args->args['<file>'];
+    [$firstFileName, $secondFileName] = $args->args['<file>'];
     $pathToFiles = $args->args['--path'];
-    //$firstFile = FileUtils\getJsonFileContent($firstArg, $pathToFiles);
-    //$secondFile = FileUtils\getJsonFileContent($secondArg, $pathToFiles);
-    //$report = generateDiff($firstFile, $secondFile);
-    //line($report);
-    $firstFile = getYamlFileContent($firstArg, $pathToFiles);
-    $secondFile = getYamlFileContent($secondArg, $pathToFiles);
-    $report = generateDiff($firstFile, $secondFile);
-    line($report);
-}
-
-function generateDiff($firstData, $secondData)
-{
-    $result = "{\n";
-    foreach ($firstData as $key => $value) {
-        if (array_key_exists($key, $secondData)) {
-            if ($firstData[$key] === $secondData[$key]) {
-                $result = "{$result}    {$key}: {$value}\n";
-            } else {
-                $result = "{$result}    + {$key}: {$secondData[$key]}\n    - {$key}: {$value}\n";
-            }
-        } else {
-            $result = "{$result}    - {$key}: {$value}\n";
-        }
+    $firstFileFullPath = "{$pathToFiles}{$firstFileName}";
+    $secondFileFullPath = "{$pathToFiles}{$secondFileName}";
+    if (!isFilesExists($firstFileFullPath, $secondFileFullPath)) {
+        line('Error: one of files does not exists.');
+        return;
     }
-    foreach ($secondData as $key => $value) {
-        if (!array_key_exists($key, $firstData)) {
-            if (is_bool($value)) {
-                $value = $value ? "true" : "false";
-            }
-            $result = "{$result}    + {$key}: {$value}\n";
-        }
+    if (!isFilesExtensionSame($firstFileName, $secondFileName)) {
+        line('Error: files extensions are not the same.');
+        return;
     }
-    $result = "{$result}}";
-    return $result;
+    [, $filesExtension] = explode('.', $firstFileName);
+    try {
+        $parser = new FileParser($firstFileFullPath, $secondFileFullPath, $filesExtension);
+        $result = $parser->parseFiles();
+    } catch (\Exception $error) {
+        line($error);
+        return;
+    }
+    var_dump($result);
 }
