@@ -53,19 +53,6 @@ class FileParser
     {
         $firstFileContent = Yaml::parseFile($this->pathToFiles['firstPath']);
         $secondFileContent = Yaml::parseFile($this->pathToFiles['secondPath']);
-        /*$firstCorrectedFile = $this->correctYamlKeys($firstFileContent);
-        $secondCorrectedFile = $this->correctYamlKeys($secondFileContent);
-        return ['firstFileContent' => $firstCorrectedFile, 'secondFileContent' => $secondCorrectedFile];
-        */
         return [$firstFileContent, $secondFileContent];
-    }
-
-    private function correctYamlKeys($parsedYaml)
-    {
-        $result = $parsedYaml;
-        foreach ($result as $key => $value) {
-            $result[$key] = $result[$key][0];
-        }
-        return $result;
     }
 }
