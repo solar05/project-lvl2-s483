@@ -10,7 +10,7 @@ class FileUtilsTest extends TestCase
 {
     public function testIsFileExist()
     {
-        $path = './fixtures/';
+        $path = './tests/fixtures/';
         $this->assertFalse(isFilesExists("{$path}fds", "{$path}b.json"));
         $this->assertTrue(isFilesExists("{$path}testfile.json", "{$path}a.json"));
     }

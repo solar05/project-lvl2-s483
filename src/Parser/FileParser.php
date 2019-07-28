@@ -46,7 +46,7 @@ class FileParser
         if (json_last_error() !== JSON_ERROR_NONE) {
             throw new \Exception(json_last_error_msg());
         }
-        return ['firstFileContent' => $fileJsonContent, 'secondFileContent' => $secondJsonContent];
+        return [$fileJsonContent, $secondJsonContent];
     }
 
     private function parseYaml()
@@ -57,7 +57,7 @@ class FileParser
         $secondCorrectedFile = $this->correctYamlKeys($secondFileContent);
         return ['firstFileContent' => $firstCorrectedFile, 'secondFileContent' => $secondCorrectedFile];
         */
-        return ['a' => $firstFileContent, 'b' => $secondFileContent];
+        return [$firstFileContent, $secondFileContent];
     }
 
     private function correctYamlKeys($parsedYaml)

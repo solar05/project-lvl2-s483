@@ -43,5 +43,5 @@ Options:
         line($error);
         return;
     }
-    var_dump($result);
+    print_r(AST\makeAst(...$result));
 }
