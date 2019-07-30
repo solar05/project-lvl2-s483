@@ -14,9 +14,9 @@
         "files": [
             "src/main.php",
             "src/Utils/FileUtils.php",
-            "src/Parser/FileParser.php",
-            "src/AST/Ast.php",
-            "src/ReportGenerator/ReportGenerator.php"
+            "src/FileParser.php",
+            "src/Ast.php",
+            "src/ReportGenerator.php"
         ]
     },
     "keywords": ["difference", "console", "library"],
