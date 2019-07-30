@@ -8,7 +8,7 @@ use function Gendiff\Utils\FileUtils\isFilesExtensionSame;
 use function Gendiff\Utils\FileUtils\isFilesExists;
 use Gendiff\FileParser\FileParser;
 use Gendiff\AST;
-use Gendiff\ReportGenerator\ReportGenerator;
+use function Gendiff\ReportGenerator\generateReport;
 
 function run()
 {
@@ -43,9 +43,9 @@ Options:
         $result = $parser->parseFiles();
         //var_dump($format);
         $ast = AST\makeAst(...$result);
-        $reporter = new ReportGenerator();
+        $report = generateReport($format, $ast);
         //var_dump($ast);
-        var_dump($reporter->generateReport($format, $ast));
+        var_dump($report);
     } catch (\Exception $error) {
         line($error);
         return;
