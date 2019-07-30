@@ -4,8 +4,16 @@ namespace Gendiff\AST;
 
 use function Funct\Collection\union;
 
-function makeAst(array $firstArray, array $secondArray)
+function makeAst(array $firstData, array $secondData)
 {
+    $firstArray = boolToString($firstData);
+    $secondArray = boolToString($secondData);
+    $secondArray = array_map(function ($value) {
+        if (is_bool($value)) {
+            return $value ? "true" : "false";
+        }
+        return $value;
+    }, $secondArray);
     $union = union(array_keys($firstArray), array_keys($secondArray));
     return array_reduce($union, function ($acc, $key) use ($firstArray, $secondArray) {
         if (array_key_exists($key, $firstArray) && array_key_exists($key, $secondArray)) {
@@ -39,33 +47,12 @@ function makeAst(array $firstArray, array $secondArray)
     }, []);
 }
 
-function renderAst($ast)
+function boolToString(array $array)
 {
-    echo 'b';
-}
-
-function generateDiff($firstData, $secondData)
-{
-    $result = "{\n";
-    foreach ($firstData as $key => $value) {
-        if (array_key_exists($key, $secondData)) {
-            if ($firstData[$key] === $secondData[$key]) {
-                $result = "{$result}    {$key}: {$value}\n";
-            } else {
-                $result = "{$result}    + {$key}: {$secondData[$key]}\n    - {$key}: {$value}\n";
-            }
-        } else {
-            $result = "{$result}    - {$key}: {$value}\n";
+    return array_map(function ($value) {
+        if (is_bool($value)) {
+            $value = $value ? "true" : "false";
         }
-    }
-    foreach ($secondData as $key => $value) {
-        if (!array_key_exists($key, $firstData)) {
-            if (is_bool($value)) {
-                $value = $value ? "true" : "false";
-            }
-            $result = "{$result}    + {$key}: {$value}\n";
-        }
-    }
-    $result = "{$result}}";
-    return $result;
+        return $value;
+    }, $array);
 }

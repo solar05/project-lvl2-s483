@@ -8,13 +8,14 @@ use function Gendiff\Utils\FileUtils\isFilesExtensionSame;
 use function Gendiff\Utils\FileUtils\isFilesExists;
 use Gendiff\FileParser\FileParser;
 use Gendiff\AST;
+use Gendiff\ReportGenerator\ReportGenerator;
 
 function run()
 {
     $documentation = "
 Generate diff
 
-Usage: gendiff <file> <file> --path=<path>
+Usage: gendiff --format=<fmt> <file> <file> --path=<path>
 gendiff (-h|--help)
 gendiff [--format <fmt>] <firstFile> <secondFile>
 
@@ -23,6 +24,7 @@ Options:
   --format <fmt>                Report format [default: pretty]
 ";
     $args = Docopt::handle($documentation, array('version' => 'GenDiff 1.0'));
+    $format = $args->args['--format'];
     [$firstFileName, $secondFileName] = $args->args['<file>'];
     $pathToFiles = $args->args['--path'];
     $firstFileFullPath = "{$pathToFiles}{$firstFileName}";
@@ -39,9 +41,13 @@ Options:
     try {
         $parser = new FileParser($firstFileFullPath, $secondFileFullPath, $filesExtension);
         $result = $parser->parseFiles();
+        //var_dump($format);
+        $ast = AST\makeAst(...$result);
+        $reporter = new ReportGenerator();
+        //var_dump($ast);
+        var_dump($reporter->generateReport($format, $ast));
     } catch (\Exception $error) {
         line($error);
         return;
     }
-    var_dump(AST\makeAst(...$result));
 }
