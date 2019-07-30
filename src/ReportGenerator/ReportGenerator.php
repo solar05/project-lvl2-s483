@@ -11,6 +11,8 @@ class ReportGenerator
         switch ($format) {
             case 'plain':
                 return $this->plainReport($ast);
+            case 'json':
+                return $this->jsonReport($ast);
             default:
                 throw new \Exception("{$format} format is unsupported.");
         }
@@ -44,5 +46,10 @@ class ReportGenerator
             }, []);
         };
         return implode("\n", $iterator($ast, []));
+    }
+
+    private function jsonReport(array $ast)
+    {
+        return json_encode($ast);
     }
 }
