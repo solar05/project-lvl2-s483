@@ -41,13 +41,11 @@ Options:
     try {
         $parser = new FileParser($firstFileFullPath, $secondFileFullPath, $filesExtension);
         $result = $parser->parseFiles();
-        //var_dump($format);
         $ast = AST\makeAst(...$result);
         $report = generateReport($format, $ast);
-        //var_dump($ast);
-        var_dump($report);
     } catch (\Exception $error) {
         line($error);
         return;
     }
+    line($report);
 }
