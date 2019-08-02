@@ -15,9 +15,9 @@ if (file_exists($autoloadPath1)) {
 $documentation = "
 Generate diff
 
-Usage: gendiff --format=<fmt> <file> <file> --path=<path>
-gendiff (-h|--help)
-gendiff [--format <fmt>] <firstFile> <secondFile>
+Usage: 
+ gendiff (-h|--help)
+ gendiff [--format <fmt>] <firstFile> <secondFile>
 
 Options:
   -h --help                     Show this screen

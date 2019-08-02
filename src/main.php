@@ -13,21 +13,19 @@ const AVAILABLE_EXTENSIONS = ["json", "yaml"];
 function runGendiff($args)
 {
     $format = $args->args['--format'];
-    [$firstFileName, $secondFileName] = $args->args['<file>'];
-    $pathToFiles = $args->args['--path'];
-    $firstFileFullPath = "{$pathToFiles}{$firstFileName}";
-    $secondFileFullPath = "{$pathToFiles}{$secondFileName}";
-    [, $firstFileExtension] = explode('.', $firstFileName);
-    [, $secondFileExtension] = explode('.', $secondFileName);
+    $firstFilePath = $args->args['<firstFile>'];
+    $secondFilePath = $args->args['<secondFile>'];
+    [, $firstFileExtension] = explode('.', $firstFilePath);
+    [, $secondFileExtension] = explode('.', $secondFilePath);
     try {
-        if (!isFilesExists($firstFileFullPath, $secondFileFullPath)) {
+        if (!isFilesExists($firstFilePath, $secondFilePath)) {
             throw new \Exception('Error: one of files does not exists.');
         } elseif (!($firstFileExtension === $secondFileExtension)) {
             throw new \Exception('Error: files extensions are not the same.');
         } elseif (!in_array($firstFileExtension, AVAILABLE_EXTENSIONS)) {
             throw new \Exception("Error: {$firstFileExtension} extension is unsupported.");
         }
-        $parsedData = parseFiles($firstFileFullPath, $secondFileFullPath, $firstFileExtension);
+        $parsedData = parseFiles($firstFilePath, $secondFilePath, $firstFileExtension);
         $ast = makeAst(...$parsedData);
         $report = generateReport($format, $ast);
     } catch (\Exception $error) {
