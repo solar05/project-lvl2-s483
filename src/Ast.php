@@ -8,12 +8,6 @@ function makeAst(array $firstData, array $secondData)
 {
     $firstArray = boolToString($firstData);
     $secondArray = boolToString($secondData);
-    $secondArray = array_map(function ($value) {
-        if (is_bool($value)) {
-            return $value ? "true" : "false";
-        }
-        return $value;
-    }, $secondArray);
     $union = union(array_keys($firstArray), array_keys($secondArray));
     return array_reduce($union, function ($acc, $key) use ($firstArray, $secondArray) {
         if (array_key_exists($key, $firstArray) && array_key_exists($key, $secondArray)) {

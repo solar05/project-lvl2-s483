@@ -14,10 +14,4 @@ class FileUtilsTest extends TestCase
         $this->assertFalse(isFilesExists("{$path}fds", "{$path}b.json"));
         $this->assertTrue(isFilesExists("{$path}plain-b.json", "{$path}plain-a.json"));
     }
-
-    public function testIsFilesExtensionSame()
-    {
-        $this->assertTrue(isFilesExtensionSame('plain-a.json', 'plain-b.json'));
-        $this->assertFalse(isFilesExtensionSame('plain-a.json', 'plain-b.yaml'));
-    }
 }

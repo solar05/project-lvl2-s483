@@ -3,7 +3,6 @@
 namespace Gendiff\Main;
 
 use function cli\line;
-use function Gendiff\Utils\FileUtils\isFilesExtensionSame;
 use function Gendiff\Utils\FileUtils\isFilesExists;
 use function Gendiff\FileParser\parseFiles;
 use function Gendiff\AST\makeAst;
@@ -20,17 +19,14 @@ function runGendiff($args)
     $secondFileFullPath = "{$pathToFiles}{$secondFileName}";
     [, $firstFileExtension] = explode('.', $firstFileName);
     [, $secondFileExtension] = explode('.', $secondFileName);
-    if (!isFilesExists($firstFileFullPath, $secondFileFullPath)) {
-        line('Error: one of files does not exists.');
-        return;
-    } elseif (!($firstFileExtension === $secondFileExtension)) {
-        line('Error: files extensions are not the same.');
-        return;
-    } elseif (!in_array($firstFileExtension, AVAILABLE_EXTENSIONS)) {
-        line("Error: {$firstFileExtension} extension is unsupported.");
-        return;
-    }
     try {
+        if (!isFilesExists($firstFileFullPath, $secondFileFullPath)) {
+            throw new \Exception('Error: one of files does not exists.');
+        } elseif (!($firstFileExtension === $secondFileExtension)) {
+            throw new \Exception('Error: files extensions are not the same.');
+        } elseif (!in_array($firstFileExtension, AVAILABLE_EXTENSIONS)) {
+            throw new \Exception("Error: {$firstFileExtension} extension is unsupported.");
+        }
         $parsedData = parseFiles($firstFileFullPath, $secondFileFullPath, $firstFileExtension);
         $ast = makeAst(...$parsedData);
         $report = generateReport($format, $ast);
