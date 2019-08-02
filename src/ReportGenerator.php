@@ -3,7 +3,6 @@
 namespace Gendiff\ReportGenerator;
 
 use function Funct\Collection\flattenAll;
-use function Funct\Collection\get;
 
 function generateReport(string $format, array $ast)
 {
@@ -83,7 +82,8 @@ function prettyReport(array $ast, $level = 0)
         return $str;
     }, $ast);
     $text = implode("\n", flattenAll($lines));
-    return getFinalString($text, $level);
+    $finalIndents = getIndents($level);
+    return "{\n{$text}\n{$finalIndents}}";
 }
 
 function processToString($data, $level = 0)
@@ -97,16 +97,11 @@ function processToString($data, $level = 0)
         return $acc;
     }, []);
     $text = implode("\n", $lines) . "\n";
-    return getFinalString($text, $level);
-}
-
-function getFinalString($text, $level)
-{
     $indents = getIndents($level);
-    return "{\n{$text}{$indents}\n}";
+    return "{\n{$text}{$indents}}";
 }
 
 function getIndents($level)
 {
-    return str_repeat('', $level * 4);
+    return str_repeat(' ', $level * 4);
 }

@@ -4,55 +4,38 @@ namespace  Gendiff\FileParser;
 
 use Symfony\Component\Yaml\Yaml;
 
-class FileParser
+function parseFiles($firstPathToFile, $secondPathToFile, $filesExtension)
 {
-    private $filesExtension;
-    private $pathToFiles;
-    private $availableExtensions = ["json", "yaml"];
-
-    public function __construct($firstPathToFile, $secondPathToFile, $extension)
-    {
-        if (in_array($extension, $this->availableExtensions)) {
-            $this->filesExtension = $extension;
-            $this->pathToFiles = ['firstPath' => $firstPathToFile, 'secondPath' => $secondPathToFile];
-        } else {
-            throw new \Exception("Files with {$extension} is not supported!");
-        }
+    $result = [];
+    switch ($filesExtension) {
+        case 'json':
+            $result = parseJson($firstPathToFile, $secondPathToFile);
+            break;
+        case 'yaml':
+            $result = parseYaml($firstPathToFile, $secondPathToFile);
+            break;
     }
+    return $result;
+}
 
-    public function parseFiles()
-    {
-        $result = [];
-        switch ($this->filesExtension) {
-            case 'json':
-                $result = $this->parseJson();
-                break;
-            case 'yaml':
-                $result = $this->parseYaml();
-                break;
-        }
-        return $result;
+function parseJson($firstPathToFile, $secondPathToFile)
+{
+    $firstFileRawContent = file_get_contents($firstPathToFile);
+    $secondFileRawContent = file_get_contents($secondPathToFile);
+    $fileJsonContent = json_decode($firstFileRawContent, true);
+    if (json_last_error() !== JSON_ERROR_NONE) {
+        throw new \Exception(json_last_error_msg());
     }
+    $secondJsonContent = json_decode($secondFileRawContent, true);
+    if (json_last_error() !== JSON_ERROR_NONE) {
+        throw new \Exception(json_last_error_msg());
+    }
+    return [$fileJsonContent, $secondJsonContent];
+}
 
-    private function parseJson()
-    {
-        $firstFileRawContent = file_get_contents($this->pathToFiles['firstPath']);
-        $secondFileRawContent = file_get_contents($this->pathToFiles['secondPath']);
-        $fileJsonContent = json_decode($firstFileRawContent, true);
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new \Exception(json_last_error_msg());
-        }
-        $secondJsonContent = json_decode($secondFileRawContent, true);
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new \Exception(json_last_error_msg());
-        }
-        return [$fileJsonContent, $secondJsonContent];
-    }
-
-    private function parseYaml()
-    {
-        $firstFileContent = Yaml::parseFile($this->pathToFiles['firstPath']);
-        $secondFileContent = Yaml::parseFile($this->pathToFiles['secondPath']);
-        return [$firstFileContent, $secondFileContent];
-    }
+function parseYaml($firstPathToFile, $secondPathToFile)
+{
+    $firstFileContent = Yaml::parseFile($firstPathToFile);
+    $secondFileContent = Yaml::parseFile($secondPathToFile);
+    return [$firstFileContent, $secondFileContent];
 }
