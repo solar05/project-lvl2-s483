@@ -4,7 +4,6 @@ namespace Gendiff\Tests\Utils;
 
 use PHPUnit\Framework\TestCase;
 use function Gendiff\Utils\FileUtils\isFilesExists;
-use function Gendiff\Utils\FileUtils\isFilesExtensionSame;
 
 class FileUtilsTest extends TestCase
 {

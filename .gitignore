@@ -1,8 +1,3 @@
 /vendor/
-/src/.DS_Store
 .idea/
-.DS_Store
-bin/a.json
-bin/b.json
-bin/a.yaml
-bin/b.yaml
+*.DS_Store
