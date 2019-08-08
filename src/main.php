@@ -2,7 +2,7 @@
 
 namespace Gendiff\Main;
 
-use function cli\line;
+use function Funct\Collection\last;
 use function Gendiff\Utils\FileUtils\isFilesExists;
 use function Gendiff\FileParser\parseFiles;
 use function Gendiff\AST\makeAst;
@@ -10,13 +10,10 @@ use function Gendiff\ReportGenerator\generateReport;
 
 const AVAILABLE_EXTENSIONS = ["json", "yaml"];
 
-function runGendiff($args)
+function runGendiff(string $format, string $firstFilePath, string $secondFilePath)
 {
-    $format = $args->args['--format'];
-    $firstFilePath = $args->args['<firstFile>'];
-    $secondFilePath = $args->args['<secondFile>'];
-    [, $firstFileExtension] = explode('.', $firstFilePath);
-    [, $secondFileExtension] = explode('.', $secondFilePath);
+    $firstFileExtension = last(explode('.', $firstFilePath));
+    $secondFileExtension = last(explode('.', $secondFilePath));
     try {
         if (!isFilesExists($firstFilePath, $secondFilePath)) {
             throw new \Exception('Error: one of files does not exists.');
@@ -29,8 +26,7 @@ function runGendiff($args)
         $ast = makeAst(...$parsedData);
         $report = generateReport($format, $ast);
     } catch (\Exception $error) {
-        line($error);
-        return;
+        return $error->getMessage();
     }
-    line($report);
+    return $report;
 }
