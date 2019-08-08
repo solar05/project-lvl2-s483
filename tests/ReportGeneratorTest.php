@@ -2,12 +2,8 @@
 
 namespace Gendiff\Tests;
 
+use function Gendiff\Main\runGendiff;
 use PHPUnit\Framework\TestCase;
-use function Gendiff\ReportGenerator\prettyReport;
-use function Gendiff\ReportGenerator\plainReport;
-use function Gendiff\ReportGenerator\jsonReport;
-use function Gendiff\FileParser\parseFiles;
-use function Gendiff\AST\makeAst;
 
 class ReportGeneratorTest extends TestCase
 {
@@ -17,69 +13,122 @@ class ReportGeneratorTest extends TestCase
     private $expectedPlainNested;
     private $expectedPrettyNested;
     private $expectedJsonNested;
+    private $fixturesPath;
 
-    public function setUp() : void
+    public function setUp(): void
     {
-        $this->expectedPlain = file_get_contents('./tests/fixtures/expected-plain.txt');
-        $this->expectedPretty = file_get_contents('./tests/fixtures/expected-pretty.txt');
-        $this->expectedJson = file_get_contents('./tests/fixtures/expected-json.txt');
-        $this->expectedPlainNested = file_get_contents('./tests/fixtures/expected-plain-nested.txt');
-        $this->expectedPrettyNested = file_get_contents('./tests/fixtures/expected-pretty-nested.txt');
-        $this->expectedJsonNested = file_get_contents('./tests/fixtures/expected-json-nested.txt');
+        $this->fixturesPath = './tests/fixtures/';
+        $this->expectedPlain = file_get_contents("{$this->fixturesPath}expected-plain.txt");
+        $this->expectedPretty = file_get_contents("{$this->fixturesPath}expected-pretty.txt");
+        $this->expectedJson = file_get_contents("{$this->fixturesPath}expected-json.txt");
+        $this->expectedPlainNested = file_get_contents("{$this->fixturesPath}expected-plain-nested.txt");
+        $this->expectedPrettyNested = file_get_contents("{$this->fixturesPath}expected-pretty-nested.txt");
+        $this->expectedJsonNested = file_get_contents("{$this->fixturesPath}expected-json-nested.txt");
     }
 
-    public function setUpAstForReport($firstPathToFile, $secondPathToFile, $filesExtension)
+    public function testPlainJsonDiff()
     {
-        $parsedFile = parseFiles($firstPathToFile, $secondPathToFile, $filesExtension);
-        $ast = makeAst(...$parsedFile);
-        return $ast;
+        $this->assertEquals(
+            $this->expectedPlain,
+            runGendiff('plain', "{$this->fixturesPath}plain-a.json", "{$this->fixturesPath}plain-b.json")
+        );
     }
 
-    public function testPlainReport()
+    public function testPlainNestedJsonDiff()
     {
-        $report = plainReport($this->setUpAstForReport('./tests/fixtures/nested-a.json', './tests/fixtures/nested-b.json', 'json'));
-        $this->assertEquals($this->expectedPlainNested, $report);
-        $this->assertNotEquals("Property 'common.setting2' was removed", $report);
-        $report1 = plainReport($this->setUpAstForReport('./tests/fixtures/nested-a.yaml', './tests/fixtures/nested-b.yaml', 'yaml'));
-        $this->assertEquals($this->expectedPlainNested, $report1);
-        $this->assertNotEquals("Property 'common.setting2' was removed", $report1);
-        $report2 = plainReport($this->setUpAstForReport('./tests/fixtures/plain-a.json', './tests/fixtures/plain-b.json', 'json'));
-        $this->assertEquals($this->expectedPlain, $report2);
-        $this->assertNotEquals($this->expectedPlainNested, $report2);
-        $report3 = plainReport($this->setUpAstForReport('./tests/fixtures/plain-a.yaml', './tests/fixtures/plain-b.yaml', 'yaml'));
-        $this->assertEquals($this->expectedPlain, $report3);
-        $this->assertNotEquals($this->expectedPlainNested, $report3);
+        $this->assertEquals(
+            $this->expectedPlainNested,
+            runGendiff('plain', "{$this->fixturesPath}nested-a.json", "{$this->fixturesPath}nested-b.json")
+        );
     }
 
-    public function testPrettyReport()
+
+    public function testPlainYamlDiff()
     {
-        $report = prettyReport($this->setUpAstForReport('./tests/fixtures/nested-a.json', './tests/fixtures/nested-b.json', 'json'));
-        $this->assertEquals($this->expectedPrettyNested, $report);
-        $this->assertNotEquals("{common: {setting1: Value 1", $report);
-        $report1 = prettyReport($this->setUpAstForReport('./tests/fixtures/nested-a.yaml', './tests/fixtures/nested-b.yaml', 'yaml'));
-        $this->assertEquals($this->expectedPrettyNested, $report1);
-        $this->assertNotEquals("{common: {setting1: Value 1", $report1);
-        $report2 = prettyReport($this->setUpAstForReport('./tests/fixtures/plain-a.yaml', './tests/fixtures/plain-b.yaml', 'yaml'));
-        $this->assertEquals($this->expectedPretty, $report2);
-        $this->assertNotEquals($this->expectedPrettyNested, $report2);
-        $report3 = prettyReport($this->setUpAstForReport('./tests/fixtures/plain-a.json', './tests/fixtures/plain-b.json', 'json'));
-        $this->assertEquals($this->expectedPretty, $report3);
-        $this->assertNotEquals($this->expectedPrettyNested, $report3);
+        $this->assertEquals(
+            $this->expectedPlain,
+            runGendiff('plain', "{$this->fixturesPath}plain-a.yaml", "{$this->fixturesPath}plain-b.yaml")
+        );
     }
 
-    public function testJson()
+    public function testPlainNestedYamlDiff()
     {
-        $report = jsonReport($this->setUpAstForReport('./tests/fixtures/plain-a.json', './tests/fixtures/plain-b.json', 'json'));
-        $this->assertEquals($this->expectedJson, $report);
-        $this->assertNotEquals('["blah":"blah","test:"true"]', $report);
-        $report1 = jsonReport($this->setUpAstForReport('./tests/fixtures/plain-a.yaml', './tests/fixtures/plain-b.yaml', 'yaml'));
-        $this->assertEquals($this->expectedJson, $report1);
-        $this->assertNotEquals('["blah":"blah","test:"true"]', $report1);
-        $report2 = jsonReport($this->setUpAstForReport('./tests/fixtures/nested-a.json', './tests/fixtures/nested-b.json', 'json'));
-        $this->assertEquals($this->expectedJsonNested, $report2);
-        $this->assertNotEquals($this->expectedJson, $report2);
-        $report3 = jsonReport($this->setUpAstForReport('./tests/fixtures/nested-a.yaml', './tests/fixtures/nested-b.yaml', 'yaml'));
-        $this->assertEquals($this->expectedJsonNested, $report3);
-        $this->assertNotEquals($this->expectedJson, $report3);
+        $this->assertEquals(
+            $this->expectedPlainNested,
+            runGendiff('plain', "{$this->fixturesPath}nested-a.yaml", "{$this->fixturesPath}nested-b.yaml")
+        );
+    }
+
+    public function testPrettyJsonDiff()
+    {
+        $this->assertEquals(
+            $this->expectedPretty,
+            runGendiff('pretty', "{$this->fixturesPath}plain-a.json", "{$this->fixturesPath}plain-b.json")
+        );
+    }
+
+    public function testPrettyNestedJsonDiff()
+    {
+        $this->assertEquals(
+            $this->expectedPrettyNested,
+            runGendiff('pretty', "{$this->fixturesPath}nested-a.json", "{$this->fixturesPath}nested-b.json")
+        );
+    }
+
+
+    public function testPrettyYamlDiff()
+    {
+        $this->assertEquals(
+            $this->expectedPretty,
+            runGendiff('pretty', "{$this->fixturesPath}plain-a.yaml", "{$this->fixturesPath}plain-b.yaml")
+        );
+    }
+
+    public function testPrettyNestedYamlDiff()
+    {
+        $this->assertEquals(
+            $this->expectedPrettyNested,
+            runGendiff('pretty', "{$this->fixturesPath}nested-a.yaml", "{$this->fixturesPath}nested-b.yaml")
+        );
+    }
+
+    public function testPlainJsonDiffReport()
+    {
+        $this->assertEquals(
+            $this->expectedJson,
+            runGendiff('json', "{$this->fixturesPath}plain-a.yaml", "{$this->fixturesPath}plain-b.yaml")
+        );
+    }
+
+    public function testNestedJsonDiffReport()
+    {
+        $this->assertEquals(
+            $this->expectedJsonNested,
+            runGendiff('json', "{$this->fixturesPath}nested-a.yaml", "{$this->fixturesPath}nested-b.yaml")
+        );
+    }
+
+    public function testFilesExistsException()
+    {
+        $error = runGendiff('json', 'non-existent.json', "{$this->fixturesPath}nested-a.json");
+        $this->assertEquals('Error: one of files does not exists.', $error);
+    }
+
+    public function testFilesExtensionNotSameException()
+    {
+        $error = runGendiff('json', "{$this->fixturesPath}nested-a.json", "{$this->fixturesPath}nested-a.yaml");
+        $this->assertEquals('Error: files extensions are not the same.', $error);
+    }
+
+    public function testUnsupportedExtensionException()
+    {
+        $error = runGendiff('json', "{$this->fixturesPath}expected-json.txt", "{$this->fixturesPath}expected-json.txt");
+        $this->assertEquals("Error: txt extension is unsupported.", $error);
+    }
+
+    public function testUnsupportedFormatException()
+    {
+        $error = runGendiff('good', "{$this->fixturesPath}nested-a.json", "{$this->fixturesPath}nested-b.json");
+        $this->assertEquals("good format is unsupported.", $error);
     }
 }
