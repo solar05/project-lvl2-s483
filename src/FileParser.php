@@ -6,15 +6,14 @@ use Symfony\Component\Yaml\Yaml;
 
 function parseFiles($firstPathToFile, $secondPathToFile, $filesExtension)
 {
-    $result = [];
-    switch ($filesExtension) {
-        case 'json':
-            $result = parseJson($firstPathToFile, $secondPathToFile);
-            break;
-        case 'yaml':
-            $result = parseYaml($firstPathToFile, $secondPathToFile);
-            break;
-    }
+    $typeMap = [
+        'json' => function ($firstPathToFile, $secondPathToFile) {
+            return parseJson($firstPathToFile, $secondPathToFile);
+        },
+        'yaml' => function ($firstPathToFile, $secondPathToFile) {
+            return parseYaml($firstPathToFile, $secondPathToFile);
+        }];
+    $result = $typeMap[$filesExtension]($firstPathToFile, $secondPathToFile);
     return $result;
 }
 

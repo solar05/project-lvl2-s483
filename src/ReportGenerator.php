@@ -6,16 +6,22 @@ use function Funct\Collection\flattenAll;
 
 function generateReport(string $format, array $ast)
 {
-    switch ($format) {
-        case 'plain':
+    $formatMap = [
+        'plain' => function ($ast) {
             return plainReport($ast);
-        case 'pretty':
+        },
+        'pretty' => function ($ast) {
             return prettyReport($ast);
-        case 'json':
+        },
+        'json' => function ($ast) {
             return jsonReport($ast);
-        default:
+        }
+
+        ];
+    if (!array_key_exists($format, $formatMap)) {
             throw new \Exception("{$format} format is unsupported.");
     }
+    return $formatMap[$format]($ast);
 }
 
 function plainReport(array $ast)
@@ -49,34 +55,37 @@ function plainReport(array $ast)
     return implode("\n", $iterator($ast, []));
 }
 
+
 function jsonReport(array $ast)
 {
     return json_encode($ast);
 }
 
+
 function prettyReport(array $ast, $level = 0)
 {
-    $lines = array_map(function ($currentNode) use ($level) {
-        $prepNode = boolToString($currentNode);
-        switch ($prepNode['type']) {
-            case 'nested':
-                ['node' => $key, 'children' => $children] = $prepNode;
-                $str = getIndents($level) . '    ' . $key . ': ' . prettyReport($children, $level + 1);
-                break;
-            case 'added':
-                $str = getPreparedPrettyLine($level, '+', $prepNode['node'], $prepNode['to']);
-                break;
-            case 'removed':
-                $str = getPreparedPrettyLine($level, '-', $prepNode['node'], $prepNode['from']);
-                break;
-            case 'unchanged':
-                $str = getPreparedPrettyLine($level, ' ', $prepNode['node'], $prepNode['from']);
-                break;
-            case 'changed':
-                $str = [getPreparedPrettyLine($level, '-', $prepNode['node'], $prepNode['from']),
-                    getPreparedPrettyLine($level, '+', $prepNode['node'], $prepNode['to'])];
-                break;
+    $prettyTypeMap = [
+        'nested' => function ($node, $level) {
+            return getIndents($level) . '    ' . $node['node'] . ': ' . prettyReport($node['children'], $level + 1);
+        },
+        'added' => function ($node, $level) {
+            return getPreparedPrettyLine($level, '+', $node['node'], $node['to']);
+        },
+        'removed' => function ($node, $level) {
+            return getPreparedPrettyLine($level, '-', $node['node'], $node['from']);
+        },
+        'unchanged' => function ($node, $level) {
+            return getPreparedPrettyLine($level, ' ', $node['node'], $node['from']);
+        },
+        'changed' => function ($node, $level) {
+            return [getPreparedPrettyLine($level, '-', $node['node'], $node['from']),
+                getPreparedPrettyLine($level, '+', $node['node'], $node['to'])];
         }
+    ];
+
+    $lines = array_map(function ($currentNode) use ($level, $prettyTypeMap) {
+        $preparedNode = boolToString($currentNode);
+        $str = $prettyTypeMap[$preparedNode['type']]($preparedNode, $level);
         return $str;
     }, $ast);
     $text = implode("\n", flattenAll($lines));
