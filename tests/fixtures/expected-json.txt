@@ -1,1 +1,1 @@
-[{"type":"unchanged","node":"host","from":"hexlet.io","to":"hexlet.io","children":null},{"type":"changed","node":"timeout","from":20,"to":50,"children":null},{"type":"removed","node":"proxy","from":"123.234.53.22","to":"","children":null},{"type":"added","node":"verbose","from":"","to":"true","children":null}]
+[{"type":"unchanged","node":"host","from":"hexlet.io","to":"hexlet.io"},{"type":"changed","node":"timeout","from":20,"to":50},{"type":"removed","node":"proxy","from":"123.234.53.22","to":""},{"type":"added","node":"verbose","from":"","to":true}]

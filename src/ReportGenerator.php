@@ -22,21 +22,22 @@ function plainReport(array $ast)
 {
     $iterator = function ($ast, $parents) use (&$iterator) {
         return array_reduce($ast, function ($acc, $node) use ($iterator, $parents) {
-            $parents[] = $node['node'];
+            $prepNode = boolToString($node);
+            $parents[] = $prepNode['node'];
             $pathToNode = implode('.', $parents);
-            switch ($node['type']) {
+            switch ($prepNode['type']) {
                 case 'nested':
-                    $acc = array_merge($acc, $iterator($node['children'], $parents));
+                    $acc = array_merge($acc, $iterator($prepNode['children'], $parents));
                     break;
                 case 'added':
-                    if (is_array($node['to'])) {
+                    if (is_array($prepNode['to'])) {
                         $acc[] = "Property '{$pathToNode}' was added with value: 'complex value'";
                     } else {
-                        $acc[] = "Property '{$pathToNode}' was added with value: '{$node['to']}'";
+                        $acc[] = "Property '{$pathToNode}' was added with value: '{$prepNode['to']}'";
                     }
                     break;
                 case 'changed':
-                    $acc[] = "Property '{$pathToNode}' was changed. From '{$node['from']}' to '{$node['to']}'";
+                    $acc[] = "Property '{$pathToNode}' was changed. From '{$prepNode['from']}' to '{$prepNode['to']}'";
                     break;
                 case 'removed':
                     $acc[] = "Property '{$pathToNode}' was removed";
@@ -56,27 +57,24 @@ function jsonReport(array $ast)
 function prettyReport(array $ast, $level = 0)
 {
     $lines = array_map(function ($currentNode) use ($level) {
-        ['type' => $type,
-        'node' => $key,
-        'from' => $oldValue,
-        'to' => $newValue,
-        'children' => $children] = $currentNode;
-        switch ($type) {
+        $prepNode = boolToString($currentNode);
+        switch ($prepNode['type']) {
             case 'nested':
+                ['node' => $key, 'children' => $children] = $prepNode;
                 $str = getIndents($level) . '    ' . $key . ': ' . prettyReport($children, $level + 1);
                 break;
             case 'added':
-                $str = getIndents($level) . '  + ' . $key . ': ' . processToString($newValue, $level + 1);
+                $str = getPreparedPrettyLine($level, '+', $prepNode['node'], $prepNode['to']);
                 break;
             case 'removed':
-                $str = getIndents($level) . '  - ' . $key . ': ' . processToString($oldValue, $level + 1);
+                $str = getPreparedPrettyLine($level, '-', $prepNode['node'], $prepNode['from']);
                 break;
             case 'unchanged':
-                $str = getIndents($level) . '    ' . $key . ': ' . processToString($oldValue, $level + 1);
+                $str = getPreparedPrettyLine($level, ' ', $prepNode['node'], $prepNode['from']);
                 break;
             case 'changed':
-                $str = [getIndents($level) . '  - ' . $key . ': ' . processToString($oldValue, $level + 1),
-                    getIndents($level) . '  + ' . $key . ': ' . processToString($newValue, $level + 1)];
+                $str = [getPreparedPrettyLine($level, '-', $prepNode['node'], $prepNode['from']),
+                    getPreparedPrettyLine($level, '+', $prepNode['node'], $prepNode['to'])];
                 break;
         }
         return $str;
@@ -104,4 +102,19 @@ function processToString($data, $level = 0)
 function getIndents($level)
 {
     return str_repeat(' ', $level * 4);
+}
+
+function getPreparedPrettyLine($level, $sign, $key, $value)
+{
+    return getIndents($level) . "  {$sign} " . $key . ": " . processToString($value, $level + 1);
+}
+
+function boolToString(array $array)
+{
+    return array_map(function ($value) {
+        if (is_bool($value)) {
+            $value = $value ? "true" : "false";
+        }
+        return $value;
+    }, $array);
 }

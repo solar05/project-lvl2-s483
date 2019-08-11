@@ -6,53 +6,35 @@ use function Funct\Collection\union;
 
 function makeAst(array $firstData, array $secondData)
 {
-    $firstArray = boolToString($firstData);
-    $secondArray = boolToString($secondData);
-    $union = union(array_keys($firstArray), array_keys($secondArray));
-    return array_reduce($union, function ($acc, $key) use ($firstArray, $secondArray) {
-        if (array_key_exists($key, $firstArray) && array_key_exists($key, $secondArray)) {
-            if (is_array($firstArray[$key]) && is_array($secondArray[$key])) {
+    $union = union(array_keys($firstData), array_keys($secondData));
+    return array_reduce($union, function ($acc, $key) use ($firstData, $secondData) {
+        if (array_key_exists($key, $firstData) && array_key_exists($key, $secondData)) {
+            if (is_array($firstData[$key]) && is_array($secondData[$key])) {
                 $acc[] = ['type' => 'nested',
                     'node' => $key,
-                    'from' => null,
-                    'to' => null,
-                    'children' => makeAst($firstArray[$key], $secondArray[$key])];
-            } elseif ($firstArray[$key] === $secondArray[$key]) {
+                    'children' => makeAst($firstData[$key], $secondData[$key])];
+            } elseif ($firstData[$key] === $secondData[$key]) {
                     $acc[] = ['type' => 'unchanged',
                         'node' => $key,
-                        'from' => $secondArray[$key],
-                        'to' => $secondArray[$key],
-                        'children' => null];
+                        'from' => $secondData[$key],
+                        'to' => $secondData[$key]];
             } else {
                     $acc[] = ['type' => 'changed',
                         'node' => $key,
-                        'from' => $firstArray[$key],
-                        'to' => $secondArray[$key],
-                        'children' => null];
+                        'from' => $firstData[$key],
+                        'to' => $secondData[$key]];
             }
-        } elseif (!array_key_exists($key, $firstArray)) {
+        } elseif (!array_key_exists($key, $firstData)) {
             $acc[] = ['type' => 'added',
                 'node' => $key,
                 'from' => '',
-                'to' => $secondArray[$key],
-                'children' => null];
+                'to' => $secondData[$key]];
         } else {
             $acc[] = ['type' => 'removed',
                 'node' => $key,
-                'from' => $firstArray[$key],
-                'to' => '',
-                'children' => null];
+                'from' => $firstData[$key],
+                'to' => ''];
         }
         return $acc;
     }, []);
-}
-
-function boolToString(array $array)
-{
-    return array_map(function ($value) {
-        if (is_bool($value)) {
-            $value = $value ? "true" : "false";
-        }
-        return $value;
-    }, $array);
 }
