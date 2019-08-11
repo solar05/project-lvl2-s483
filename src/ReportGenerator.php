@@ -8,7 +8,7 @@ function generateReport(string $format, array $ast)
 {
     $formatMap = [
         'plain' => function ($ast) {
-            return plainReport($ast);
+            return implode("\n", plainReport($ast));
         },
         'pretty' => function ($ast) {
             return prettyReport($ast);
@@ -24,37 +24,42 @@ function generateReport(string $format, array $ast)
     return $formatMap[$format]($ast);
 }
 
-function plainReport(array $ast)
+function plainReport(array $ast, $parents = '')
 {
-    $iterator = function ($ast, $parents) use (&$iterator) {
-        return array_reduce($ast, function ($acc, $node) use ($iterator, $parents) {
-            $prepNode = boolToString($node);
-            $parents[] = $prepNode['node'];
-            $pathToNode = implode('.', $parents);
-            switch ($prepNode['type']) {
-                case 'nested':
-                    $acc = array_merge($acc, $iterator($prepNode['children'], $parents));
-                    break;
-                case 'added':
-                    if (is_array($prepNode['to'])) {
-                        $acc[] = "Property '{$pathToNode}' was added with value: 'complex value'";
-                    } else {
-                        $acc[] = "Property '{$pathToNode}' was added with value: '{$prepNode['to']}'";
-                    }
-                    break;
-                case 'changed':
-                    $acc[] = "Property '{$pathToNode}' was changed. From '{$prepNode['from']}' to '{$prepNode['to']}'";
-                    break;
-                case 'removed':
-                    $acc[] = "Property '{$pathToNode}' was removed";
-                    break;
-            }
-            return $acc;
-        }, []);
-    };
-    return implode("\n", $iterator($ast, []));
+    $sortedNodes = array_filter($ast, function ($key) {
+        return $key['type'] !== 'unchanged';
+    });
+    $plainTypeMap = [
+        'nested' => function ($node) use ($parents) {
+            $nextParents = $parents . $node['node'] . '.';
+            return plainReport($node['children'], $nextParents);
+        },
+        'added' => function ($node) use ($parents) {
+            $pathToNode = $parents . $node['node'];
+            $value = isComplexOrBool($node['to']);
+            return ["Property '{$pathToNode}' was added with value: '{$value}'"];
+        },
+        'removed' => function ($node) use ($parents) {
+            $pathToNode = $parents . $node['node'];
+            return ["Property '{$pathToNode}' was removed"];
+        },
+        'changed' => function ($node) use ($parents) {
+            $pathToNode = $parents . $node['node'];
+            $oldValue = isComplexOrBool($node['from']);
+            $newValue = isComplexOrBool($node['to']);
+            return ["Property '{$pathToNode}' was changed. From '{$oldValue}' to '{$newValue}'"];
+        }
+    ];
+    return array_reduce($sortedNodes, function ($acc, $node) use ($plainTypeMap) {
+        $newAcc = array_merge($acc, $plainTypeMap[$node['type']]($node));
+        return $newAcc;
+    }, []);
 }
 
+function isComplexOrBool($value)
+{
+    return is_array($value) ? 'complex value' : boolToString($value);
+}
 
 function jsonReport(array $ast)
 {
@@ -118,12 +123,17 @@ function getPreparedPrettyLine($level, $sign, $key, $value)
     return getIndents($level) . "  {$sign} " . $key . ": " . processToString($value, $level + 1);
 }
 
-function boolToString(array $array)
+function boolToString($value)
 {
-    return array_map(function ($value) {
-        if (is_bool($value)) {
-            $value = $value ? "true" : "false";
-        }
-        return $value;
-    }, $array);
+    if (is_array($value)) {
+        return array_map(function ($value) {
+            if (is_bool($value)) {
+                $value = $value ? "true" : "false";
+            }
+            return $value;
+        }, $value);
+    } elseif (is_bool($value)) {
+        return $value ? "true" : "false";
+    }
+    return $value;
 }
