@@ -3,7 +3,6 @@
 namespace Gendiff\Main;
 
 use function Funct\Collection\last;
-use function Gendiff\Utils\FileUtils\isFilesExists;
 use function Gendiff\FileParser\parseFiles;
 use function Gendiff\AST\makeAst;
 use function Gendiff\ReportGenerator\generateReport;
@@ -15,7 +14,7 @@ function runGendiff(string $format, string $firstFilePath, string $secondFilePat
     $firstFileExtension = last(explode('.', $firstFilePath));
     $secondFileExtension = last(explode('.', $secondFilePath));
     try {
-        if (!isFilesExists($firstFilePath, $secondFilePath)) {
+        if (!(file_exists($firstFilePath) && file_exists($secondFilePath))) {
             throw new \Exception('Error: one of files does not exists.');
         } elseif (!($firstFileExtension === $secondFileExtension)) {
             throw new \Exception('Error: files extensions are not the same.');

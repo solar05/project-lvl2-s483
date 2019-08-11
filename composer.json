@@ -13,7 +13,6 @@
     "autoload": {
         "files": [
             "src/main.php",
-            "src/Utils/FileUtils.php",
             "src/Ast.php",
             "src/ReportGenerator.php",
             "src/FileParser.php"
