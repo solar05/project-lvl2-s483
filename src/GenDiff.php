@@ -19,7 +19,7 @@ function genDiff(string $firstFilePath, string $secondFilePath, string $format)
     if (!($firstFileExtension === $secondFileExtension)) {
         throw new \Exception('Error: files extensions are not the same.');
     } elseif (!in_array($firstFileExtension, AVAILABLE_EXTENSIONS)) {
-            throw new \Exception("Error: {$firstFileExtension} extension is unsupported.");
+        throw new \Exception("Error: {$firstFileExtension} extension is unsupported.");
     }
     $parsedData = parseFiles($firstFilePath, $secondFilePath, $firstFileExtension);
     $ast = makeAst(...$parsedData);
