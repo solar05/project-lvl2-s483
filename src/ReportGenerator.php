@@ -4,7 +4,7 @@ namespace Differ\ReportGenerator;
 
 use function Funct\Collection\flattenAll;
 
-function generateReport(string $format, array $ast)
+function generateReport(array $ast, string $format)
 {
     $formatMap = [
         'plain' => function ($ast) {

@@ -23,6 +23,6 @@ function genDiff(string $firstFilePath, string $secondFilePath, string $format)
     }
     $parsedData = parseFiles($firstFilePath, $secondFilePath, $firstFileExtension);
     $ast = makeAst(...$parsedData);
-    $report = generateReport($format, $ast);
+    $report = generateReport($ast, $format);
     return $report;
 }
