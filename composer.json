@@ -14,8 +14,12 @@
         "files": [
             "src/GenDiff.php",
             "src/Ast.php",
-            "src/ReportGenerator.php",
-            "src/FileParser.php"
+            "src/FileParser.php",
+            "src/ReportGenerator/ReportGenerator.php",
+            "src/ReportGenerator/JsonReporter.php",
+            "src/ReportGenerator/PlainReporter.php",
+            "src/ReportGenerator/PrettyReporter.php",
+            "src/ReportGenerator/ReporterUtils.php"
         ]
     },
     "keywords": ["difference", "console", "library"],
