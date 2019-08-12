@@ -36,7 +36,7 @@ function plainReport(array $ast, $parents = '')
         },
         'added' => function ($node) use ($parents) {
             $pathToNode = $parents . $node['node'];
-            $value = isComplexOrBool($node['to']);
+            $value = plainValueToString($node['to']);
             return ["Property '{$pathToNode}' was added with value: '{$value}'"];
         },
         'removed' => function ($node) use ($parents) {
@@ -45,8 +45,8 @@ function plainReport(array $ast, $parents = '')
         },
         'changed' => function ($node) use ($parents) {
             $pathToNode = $parents . $node['node'];
-            $oldValue = isComplexOrBool($node['from']);
-            $newValue = isComplexOrBool($node['to']);
+            $oldValue = plainValueToString($node['from']);
+            $newValue = plainValueToString($node['to']);
             return ["Property '{$pathToNode}' was changed. From '{$oldValue}' to '{$newValue}'"];
         }
     ];
@@ -56,7 +56,7 @@ function plainReport(array $ast, $parents = '')
     }, []);
 }
 
-function isComplexOrBool($value)
+function plainValueToString($value)
 {
     return is_array($value) ? 'complex value' : boolToString($value);
 }
