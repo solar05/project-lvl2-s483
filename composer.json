@@ -12,7 +12,7 @@
     ],
     "autoload": {
         "files": [
-            "src/main.php",
+            "src/GenDiff.php",
             "src/Ast.php",
             "src/ReportGenerator.php",
             "src/FileParser.php"

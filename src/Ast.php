@@ -1,6 +1,6 @@
 <?php
 
-namespace Gendiff\AST;
+namespace Differ\AST;
 
 use function Funct\Collection\union;
 

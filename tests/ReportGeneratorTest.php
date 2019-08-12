@@ -1,8 +1,8 @@
 <?php
 
-namespace Gendiff\Tests;
+namespace Differ\Tests;
 
-use function Gendiff\Main\runGendiff;
+use function Differ\GenDiff\genDiff;
 use PHPUnit\Framework\TestCase;
 
 class ReportGeneratorTest extends TestCase
@@ -17,7 +17,7 @@ class ReportGeneratorTest extends TestCase
         $expected = file_get_contents($this->fixturesPath . $fileWithExpectedData);
         $firstFilePath = $this->fixturesPath . $firstFileName;
         $secondFilePath = $this->fixturesPath . $secondFileName;
-        $this->assertEquals($expected, runGendiff($format, $firstFilePath, $secondFilePath));
+        $this->assertEquals($expected, genDiff($firstFilePath, $secondFilePath, $format));
     }
 
     public function additionProvider()
@@ -40,25 +40,37 @@ class ReportGeneratorTest extends TestCase
 
     public function testFilesExistsException()
     {
-        $error = runGendiff('json', 'non-existent.json', "{$this->fixturesPath}nested-a.json");
-        $this->assertEquals('Error: one of files does not exists.', $error);
+        try {
+             genDiff('non-existent.json', "{$this->fixturesPath}nested-a.json", 'json');
+        } catch (\Exception $error) {
+            $this->assertEquals('Error: one of files does not exists.', $error->getMessage());
+        }
     }
 
     public function testFilesExtensionNotSameException()
     {
-        $error = runGendiff('json', "{$this->fixturesPath}nested-a.json", "{$this->fixturesPath}nested-a.yaml");
-        $this->assertEquals('Error: files extensions are not the same.', $error);
+        try {
+            genDiff("{$this->fixturesPath}nested-a.json", "{$this->fixturesPath}nested-a.yaml", 'json');
+        } catch (\Exception $error) {
+            $this->assertEquals('Error: files extensions are not the same.', $error->getMessage());
+        }
     }
 
     public function testUnsupportedExtensionException()
     {
-        $error = runGendiff('json', "{$this->fixturesPath}expected-json.txt", "{$this->fixturesPath}expected-json.txt");
-        $this->assertEquals("Error: txt extension is unsupported.", $error);
+        try {
+            genDiff("{$this->fixturesPath}expected-json.txt", "{$this->fixturesPath}expected-json.txt", 'json');
+        } catch (\Exception $error) {
+            $this->assertEquals("Error: txt extension is unsupported.", $error->getMessage());
+        }
     }
 
     public function testUnsupportedFormatException()
     {
-        $error = runGendiff('good', "{$this->fixturesPath}nested-a.json", "{$this->fixturesPath}nested-b.json");
-        $this->assertEquals("good format is unsupported.", $error);
+        try {
+            genDiff("{$this->fixturesPath}nested-a.json", "{$this->fixturesPath}nested-b.json", 'good');
+        } catch (\Exception $error) {
+            $this->assertEquals("good format is unsupported.", $error->getMessage());
+        }
     }
 }

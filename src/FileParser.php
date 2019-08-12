@@ -1,6 +1,6 @@
 <?php
 
-namespace  Gendiff\FileParser;
+namespace  Differ\FileParser;
 
 use Symfony\Component\Yaml\Yaml;
 

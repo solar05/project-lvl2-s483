@@ -1,7 +1,7 @@
 #!/usr/bin/env php
 <?php
 
-use function \GenDiff\Main\runGendiff;
+use function Differ\GenDiff\genDiff;
 use function cli\line;
 
 $autoloadPath1 = __DIR__ . '/../../../autoload.php';
@@ -25,5 +25,5 @@ Options:
   --format <fmt>                Report format [default: pretty]
 ";
 $args = Docopt::handle($documentation, array('version' => 'GenDiff 1.0'));
-$report = runGendiff($args['--format'], $args['<firstFile>'], $args['<secondFile>']);
+$report = genDiff($args['<firstFile>'], $args['<secondFile>'], $args['--format']);
 line($report);

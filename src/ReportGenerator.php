@@ -1,6 +1,6 @@
 <?php
 
-namespace Gendiff\ReportGenerator;
+namespace Differ\ReportGenerator;
 
 use function Funct\Collection\flattenAll;
 
