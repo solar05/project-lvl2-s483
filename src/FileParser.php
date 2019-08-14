@@ -4,37 +4,30 @@ namespace  Differ\FileParser;
 
 use Symfony\Component\Yaml\Yaml;
 
-function parseFiles($firstPathToFile, $secondPathToFile, $filesExtension)
+function parseFileContent($fileContent, $fileExtension)
 {
     $typeMap = [
-        'json' => function ($firstPathToFile, $secondPathToFile) {
-            return parseJson($firstPathToFile, $secondPathToFile);
+        'json' => function ($fileContent) {
+            return parseJsonContent($fileContent);
         },
-        'yaml' => function ($firstPathToFile, $secondPathToFile) {
-            return parseYaml($firstPathToFile, $secondPathToFile);
+        'yaml' => function ($fileContent) {
+            return parseYamlContent($fileContent);
         }];
-    $result = $typeMap[$filesExtension]($firstPathToFile, $secondPathToFile);
+    $result = $typeMap[$fileExtension]($fileContent);
     return $result;
 }
 
-function parseJson($firstPathToFile, $secondPathToFile)
+function parseJsonContent($fileContent)
 {
-    $firstFileRawContent = file_get_contents($firstPathToFile);
-    $secondFileRawContent = file_get_contents($secondPathToFile);
-    $fileJsonContent = json_decode($firstFileRawContent, true);
+    $fileJsonContent = json_decode($fileContent, true);
     if (json_last_error() !== JSON_ERROR_NONE) {
         throw new \Exception(json_last_error_msg());
     }
-    $secondJsonContent = json_decode($secondFileRawContent, true);
-    if (json_last_error() !== JSON_ERROR_NONE) {
-        throw new \Exception(json_last_error_msg());
-    }
-    return [$fileJsonContent, $secondJsonContent];
+    return $fileJsonContent;
 }
 
-function parseYaml($firstPathToFile, $secondPathToFile)
+function parseYamlContent($fileContent)
 {
-    $firstFileContent = Yaml::parseFile($firstPathToFile);
-    $secondFileContent = Yaml::parseFile($secondPathToFile);
-    return [$firstFileContent, $secondFileContent];
+    $fileYamlContent = Yaml::parse($fileContent, true);
+    return $fileYamlContent;
 }

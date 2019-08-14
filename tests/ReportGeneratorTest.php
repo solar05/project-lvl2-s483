@@ -44,7 +44,9 @@ class ReportGeneratorTest extends TestCase
              genDiff('non-existent.json', "{$this->fixturesPath}nested-a.json", 'json');
         } catch (\Exception $error) {
             $this->assertEquals('Error: one of files does not exists.', $error->getMessage());
+            return;
         }
+        $this->fail('File nonexistent exception wasn`t thrown');
     }
 
     public function testFilesExtensionNotSameException()
@@ -53,7 +55,9 @@ class ReportGeneratorTest extends TestCase
             genDiff("{$this->fixturesPath}nested-a.json", "{$this->fixturesPath}nested-a.yaml", 'json');
         } catch (\Exception $error) {
             $this->assertEquals('Error: files extensions are not the same.', $error->getMessage());
+            return;
         }
+        $this->fail('Files extension dissimilarity exception wasn`t thrown');
     }
 
     public function testUnsupportedExtensionException()
@@ -62,7 +66,9 @@ class ReportGeneratorTest extends TestCase
             genDiff("{$this->fixturesPath}expected-json.txt", "{$this->fixturesPath}expected-json.txt", 'json');
         } catch (\Exception $error) {
             $this->assertEquals("Error: txt extension is unsupported.", $error->getMessage());
+            return;
         }
+        $this->fail('Files extension not supported exception wasn`t thrown');
     }
 
     public function testUnsupportedFormatException()
@@ -71,6 +77,8 @@ class ReportGeneratorTest extends TestCase
             genDiff("{$this->fixturesPath}nested-a.json", "{$this->fixturesPath}nested-b.json", 'good');
         } catch (\Exception $error) {
             $this->assertEquals("good format is unsupported.", $error->getMessage());
+            return;
         }
+        $this->fail('Unsupported format exception wasn`t thrown');
     }
 }

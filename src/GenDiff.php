@@ -2,7 +2,7 @@
 
 namespace Differ\GenDiff;
 
-use function Differ\FileParser\parseFiles;
+use function Differ\FileParser\parseFileContent;
 use function Differ\AST\makeAst;
 use function Differ\ReportGenerator\generateReport;
 
@@ -15,14 +15,18 @@ function genDiff(string $firstFilePath, string $secondFilePath, string $format)
     }
     $firstFileInfo = pathinfo($firstFilePath);
     $secondFileInfo = pathinfo($secondFilePath);
-    [$firstFileExtension, $secondFileExtension] = [$firstFileInfo['extension'], $secondFileInfo['extension']];
+    $firstFileExtension = $firstFileInfo['extension'];
+    $secondFileExtension = $secondFileInfo['extension'];
     if (!($firstFileExtension === $secondFileExtension)) {
         throw new \Exception('Error: files extensions are not the same.');
     } elseif (!in_array($firstFileExtension, AVAILABLE_EXTENSIONS)) {
         throw new \Exception("Error: {$firstFileExtension} extension is unsupported.");
     }
-    $parsedData = parseFiles($firstFilePath, $secondFilePath, $firstFileExtension);
-    $ast = makeAst(...$parsedData);
+    $firstFileContent = file_get_contents($firstFilePath);
+    $secondFileContent = file_get_contents($secondFilePath);
+    $firstFileParsedContent = parseFileContent($firstFileContent, $firstFileExtension);
+    $secondFileParsedContent = parseFileContent($secondFileContent, $secondFileExtension);
+    $ast = makeAst($firstFileParsedContent, $secondFileParsedContent);
     $report = generateReport($ast, $format);
     return $report;
 }
