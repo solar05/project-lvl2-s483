@@ -6,7 +6,7 @@ use function Differ\ReportGenerator\ReporterUtils\boolToString;
 
 function plainReport($ast)
 {
-    return implode("\n", prepareReport($ast));
+    return substr_replace(prepareReport($ast), "", -1);
 }
 
 function prepareReport(array $ast, $parents = '')
@@ -22,23 +22,23 @@ function prepareReport(array $ast, $parents = '')
         'added' => function ($node) use ($parents) {
             $pathToNode = $parents . $node['node'];
             $value = plainValueToString($node['to']);
-            return ["Property '{$pathToNode}' was added with value: '{$value}'"];
+            return "Property '{$pathToNode}' was added with value: '{$value}'\n";
         },
         'removed' => function ($node) use ($parents) {
             $pathToNode = $parents . $node['node'];
-            return ["Property '{$pathToNode}' was removed"];
+            return "Property '{$pathToNode}' was removed\n";
         },
         'changed' => function ($node) use ($parents) {
             $pathToNode = $parents . $node['node'];
             $oldValue = plainValueToString($node['from']);
             $newValue = plainValueToString($node['to']);
-            return ["Property '{$pathToNode}' was changed. From '{$oldValue}' to '{$newValue}'"];
+            return "Property '{$pathToNode}' was changed. From '{$oldValue}' to '{$newValue}'\n";
         }
     ];
     return array_reduce($sortedNodes, function ($acc, $node) use ($plainTypeMap) {
-        $newAcc = array_merge($acc, $plainTypeMap[$node['type']]($node));
+        $newAcc = $acc . $plainTypeMap[$node['type']]($node);
         return $newAcc;
-    }, []);
+    }, '');
 }
 
 function plainValueToString($value)

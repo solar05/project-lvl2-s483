@@ -2,7 +2,7 @@
 
 namespace Differ\GenDiff;
 
-use function Differ\FileParser\parseFileContent;
+use function Differ\Parser\parseContent;
 use function Differ\AST\makeAst;
 use function Differ\ReportGenerator\generateReport;
 
@@ -24,8 +24,8 @@ function genDiff(string $firstFilePath, string $secondFilePath, string $format)
     }
     $firstFileContent = file_get_contents($firstFilePath);
     $secondFileContent = file_get_contents($secondFilePath);
-    $firstFileParsedContent = parseFileContent($firstFileContent, $firstFileExtension);
-    $secondFileParsedContent = parseFileContent($secondFileContent, $secondFileExtension);
+    $firstFileParsedContent = parseContent($firstFileContent, $firstFileExtension);
+    $secondFileParsedContent = parseContent($secondFileContent, $secondFileExtension);
     $ast = makeAst($firstFileParsedContent, $secondFileParsedContent);
     $report = generateReport($ast, $format);
     return $report;

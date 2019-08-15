@@ -14,7 +14,7 @@
         "files": [
             "src/GenDiff.php",
             "src/Ast.php",
-            "src/FileParser.php",
+            "src/Parser.php",
             "src/ReportGenerator/ReportGenerator.php",
             "src/ReportGenerator/JsonReporter.php",
             "src/ReportGenerator/PlainReporter.php",
