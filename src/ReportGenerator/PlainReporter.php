@@ -3,45 +3,41 @@
 namespace Differ\ReportGenerator\PlainReporter;
 
 use function Differ\ReportGenerator\ReporterUtils\boolToString;
+use function Funct\Collection\flatten;
 
-function plainReport($ast)
+function plainReport($ast, $pathToNode = '')
 {
-    return substr_replace(prepareReport($ast), "", -1);
+    $preparedText = array_map(function ($node) use ($pathToNode) {
+        return renderNode($node, $pathToNode);
+    }, $ast);
+    $plainText = flatten($preparedText);
+    return implode("\n", $plainText);
 }
 
-function prepareReport(array $ast, $parents = '')
+function renderNode($node, $pathToNode)
 {
-    $sortedNodes = array_filter($ast, function ($key) {
-        return $key['type'] !== 'unchanged';
-    });
     $plainTypeMap = [
-        'nested' => function ($node) use ($parents) {
-            $nextParents = $parents . $node['node'] . '.';
-            return prepareReport($node['children'], $nextParents);
+        'nested' => function ($node) {
+            return plainReport($node['children'], "{$node['node']}.");
         },
-        'added' => function ($node) use ($parents) {
-            $pathToNode = $parents . $node['node'];
-            $value = plainValueToString($node['to']);
-            return "Property '{$pathToNode}' was added with value: '{$value}'\n";
+        'added' => function ($node) use ($pathToNode) {
+            return "Property '{$pathToNode}{$node['node']}' was added with value: " . plainValueToString($node['to']);
         },
-        'removed' => function ($node) use ($parents) {
-            $pathToNode = $parents . $node['node'];
-            return "Property '{$pathToNode}' was removed\n";
+        'removed' => function ($node) use ($pathToNode) {
+            return "Property '{$pathToNode}{$node['node']}' was removed";
         },
-        'changed' => function ($node) use ($parents) {
-            $pathToNode = $parents . $node['node'];
-            $oldValue = plainValueToString($node['from']);
-            $newValue = plainValueToString($node['to']);
-            return "Property '{$pathToNode}' was changed. From '{$oldValue}' to '{$newValue}'\n";
+        'changed' => function ($node) use ($pathToNode) {
+            return "Property '{$pathToNode}{$node['node']}' was changed. From " .
+                plainValueToString($node['from']) . ' to ' . plainValueToString($node['to']);
+        },
+        'unchanged' => function ($node) {
+            return [];
         }
     ];
-    return array_reduce($sortedNodes, function ($acc, $node) use ($plainTypeMap) {
-        $newAcc = $acc . $plainTypeMap[$node['type']]($node);
-        return $newAcc;
-    }, '');
+    return $plainTypeMap[$node['type']]($node);
 }
 
 function plainValueToString($value)
 {
-    return is_array($value) ? 'complex value' : boolToString($value);
+    return is_array($value) ? "'complex value'" : "'" . boolToString($value) . "'";
 }
