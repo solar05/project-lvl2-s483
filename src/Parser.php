@@ -15,8 +15,8 @@ function parseContent($content, $extension)
             return $jsonContent;
         },
         'yaml' => function ($content) {
-            $fileYamlContent = Yaml::parse($content, true);
-            return $fileYamlContent;
+            $yamlContent = Yaml::parse($content, true);
+            return $yamlContent;
         }];
     $result = $typeMap[$extension]($content);
     return $result;
